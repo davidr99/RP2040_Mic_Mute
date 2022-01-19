@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <Adafruit_NeoPixel.h>
+#include "USBCustomDevice.h"
 #include <USBKeyboard.h>
 
 #define RGB_PIN 2
@@ -7,7 +8,8 @@
 
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(1, RGB_PIN, NEO_GRB + NEO_KHZ800);
 
-USBKeyboard keyb;
+USBCustomDevice keyb;
+USBKeyboard keybb;
 
 uint8_t button_state = 0;
 
@@ -33,8 +35,8 @@ void loop() {
   else if ((button_state & 0xF) == 0b0001) {
     strip.setPixelColor(0, strip.Color(255, 0, 0));
     strip.show();
-    //keyb._putc('A');
-    keyb.key_code('m', 101);
+    keyb._putc('A');
+    //keyb.key_code('m', 101);
   }
   sleep_ms(2);
 }
