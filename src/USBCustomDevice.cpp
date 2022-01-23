@@ -22,6 +22,7 @@
 
 #define REPORT_ID_KEYBOARD 1
 #define REPORT_ID_VOLUME   3
+#define REPORT_ID_LED      5
 
 using namespace arduino;
 
@@ -393,15 +394,16 @@ const uint8_t *USBCustomDevice::report_desc()
         INPUT(1), 0x01,                         // Constant
 
 
-        REPORT_COUNT(1), 0x05,
+        REPORT_COUNT(1), 0x06,
         REPORT_SIZE(1), 0x01,
 
         USAGE_PAGE(1), 0x08,                    // LEDs
         USAGE_MINIMUM(1), 0x01,
         USAGE_MAXIMUM(1), 0x05,
+        USAGE(1), 0x21,                         // Microphone
         OUTPUT(1), 0x02,                        // Data, Variable, Absolute
         REPORT_COUNT(1), 0x01,
-        REPORT_SIZE(1), 0x03,
+        REPORT_SIZE(1), 0x02,
         OUTPUT(1), 0x01,                        // Constant
 
 
@@ -415,6 +417,24 @@ const uint8_t *USBCustomDevice::report_desc()
         USAGE_MAXIMUM(1), 0x65,
         INPUT(1), 0x00,                         // Data, Array
         END_COLLECTION(0),
+
+/*
+        USAGE_PAGE(1), 0x08,                    // Leds
+        USAGE(1), 0x4b,                         // Red
+        USAGE(1), 0x49,                         // Green
+        USAGE(1), 0x4A,                         // Amber
+        COLLECTION(1), 0x01,
+        REPORT_ID(1), REPORT_ID_LED,
+        LOGICAL_MINIMUM(1), 0x00,
+        LOGICAL_MAXIMUM(1), 0x01,
+        REPORT_COUNT(1), 0x01,
+        REPORT_SIZE(1), 0x03,
+        OUTPUT(1), 0x02,                         // Data, Variable, Absolute
+        REPORT_COUNT(1), 0x01,
+        REPORT_SIZE(1), 0x05,
+        OUTPUT(1), 0x01,                        // Constant
+        END_COLLECTION(0),
+        */
 
         // Media Control
         USAGE_PAGE(1), 0x0C,
@@ -452,12 +472,24 @@ void USBCustomDevice::report_rx()
     read_nb(&report);
 
     // we take [1] because [0] is the report ID
-    _lock_status = report.data[1] & 0x07;
+    if (report.data[0] == REPORT_ID_KEYBOARD)
+    {
+        _lock_status = report.data[1] & 0x07;
+    }
+    else if (report.data[0] == REPORT_ID_LED)
+    {
+        _led_status = report.data[1] & 0b111;
+    }
 }
 
 uint8_t USBCustomDevice::lock_status()
 {
     return _lock_status;
+}
+
+uint8_t USBCustomDevice::led_status()
+{
+    return _led_status;
 }
 
 int USBCustomDevice::_putc(int c)

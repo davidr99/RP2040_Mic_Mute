@@ -192,6 +192,8 @@ public:
     */
     uint8_t lock_status();
 
+    uint8_t led_status();
+
 protected:
     /*
     * Get configuration descriptor
@@ -207,6 +209,7 @@ private:
 
     uint8_t _configuration_descriptor[41];
     uint8_t _lock_status;
+    uint8_t _led_status;
     PlatformMutex _mutex;
 
 };
