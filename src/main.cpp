@@ -3,8 +3,8 @@
 #include "USBCustomDevice.h"
 //#include <USBKeyboard.h>
 
-#define RGB_PIN 2
-#define MUTE_PIN 3
+#define RGB_PIN 3
+#define MUTE_PIN 4
 
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(1, RGB_PIN, NEO_GRB + NEO_KHZ800);
 
