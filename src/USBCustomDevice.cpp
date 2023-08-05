@@ -365,7 +365,6 @@ USBCustomDevice::USBCustomDevice(USBPhy *phy, uint16_t vendor_id, uint16_t produ
     USBHID(phy, 0, 0, vendor_id, product_id, product_release)
 {
     _lock_status = 0;
-
     // User or child responsible for calling connect or init
 }
 
@@ -478,6 +477,7 @@ void USBCustomDevice::report_rx()
     }
     else if (report.data[0] == REPORT_ID_LED)
     {
+        _led_status_updated = true;
         _led_status = report.data[1] & 0b111;
     }
 }
@@ -490,6 +490,14 @@ uint8_t USBCustomDevice::lock_status()
 uint8_t USBCustomDevice::led_status()
 {
     return _led_status;
+}
+
+bool USBCustomDevice::led_status_changed()
+{
+    bool status = _led_status_updated;
+    _led_status_updated = false;
+
+    return status;
 }
 
 int USBCustomDevice::_putc(int c)
@@ -516,7 +524,7 @@ bool USBCustomDevice::key_code(uint8_t key, uint8_t modifier)
 
     report.length = 9;
 
-    if (!send(&report)) {
+    if (!send_nb(&report)) {
         _mutex.unlock();
         return false;
     }
@@ -524,7 +532,7 @@ bool USBCustomDevice::key_code(uint8_t key, uint8_t modifier)
     report.data[1] = 0;
     report.data[3] = 0;
 
-    if (!send(&report)) {
+    if (!send_nb(&report)) {
         _mutex.unlock();
         return false;
     }
@@ -546,7 +554,7 @@ bool USBCustomDevice::media_control(MEDIA_KEY key)
 
     report.length = 2;
 
-    if (!send(&report)) {
+    if (!send_nb(&report)) {
         _mutex.unlock();
         return false;
     }
@@ -556,7 +564,7 @@ bool USBCustomDevice::media_control(MEDIA_KEY key)
 
     report.length = 2;
 
-    if (!send(&report)) {
+    if (!send_nb(&report)) {
         _mutex.unlock();
         return false;
     }
