@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: CI
+name: Build PIO
 
 # Controls when the action will run. Triggers the workflow on push or pull request
 # events but only for the master branch
@@ -35,3 +35,40 @@ jobs:
       
     - name: Run PlatformIO
       run: platformio run
+
+    - name: Upload the artifact
+      uses: actions/upload-artifact@v1
+      with:
+        name: RP2040_Mic_Mute
+        path: ${{ github.workspace }}\.pio/build/pico/firmware.uf2
+
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+      with:
+        tag_name: Build-${{ github.event.head_commit.id }}
+        release_name: Latest Build
+        body: |
+          ${{ github.event.head_commit.message }}
+        draft: false
+        prerelease: true
+
+    - name: Download the artifact
+      uses: actions/download-artifact@v1
+      with:
+        name: RP2040_Mic_Mute
+        path: ./
+        
+    - name: Upload Release Asset
+      id: upload-release-asset 
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+        asset_path: firmware.uf2
+        asset_name: firmware.uf2
+        asset_content_type: application/octet-stream
+      
