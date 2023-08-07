@@ -37,7 +37,7 @@ void loop() {
     //strip.setPixelColor(0, strip.Color(255, 0, 0));
     //strip.show();
     //custDev._putc('A');
-    custDev.key_code('m', 101);
+    //custDev.key_code('m', 101);
     Serial.print("R");
   }
 
