@@ -40,7 +40,7 @@ jobs:
       uses: actions/upload-artifact@v1
       with:
         name: RP2040_Mic_Mute
-        path: ${{ github.workspace }}\.pio/build/pico/firmware.uf2
+        path: .pio/build/pico/firmware.uf2
 
     - name: Create Release
       id: create_release
