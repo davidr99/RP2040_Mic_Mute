@@ -97,7 +97,7 @@ enum FUNCTION_KEY {
  *
  * @note Synchronization level: Thread safe
  */
-class USBCustomDevice: public USBHID, public ::mbed::Stream {
+class USBCustomDevice: public USBHID {
 public:
 
     /**
@@ -140,35 +140,7 @@ public:
      */
     virtual ~USBCustomDevice();
 
-    /**
-    * To send a character defined by a modifier(CTRL, SHIFT, ALT) and the key
-    *
-    * @code
-    * //To send CTRL + s (save)
-    *  keyboard.key_code('s', KEY_CTRL);
-    * @endcode
-    *
-    * @param modifier bit 0: KEY_CTRL, bit 1: KEY_SHIFT, bit 2: KEY_ALT (default: 0)
-    * @param key character to send
-    * @returns true if there is no error, false otherwise
-    */
-    bool key_code(uint8_t key, uint8_t modifier = 0);
-
-    /**
-    * Send a character
-    *
-    * @param c character to be sent
-    * @returns true if there is no error, false otherwise
-    */
-    virtual int _putc(int c);
-
-    /**
-    * Control media keys
-    *
-    * @param key media key pressed (KEY_NEXT_TRACK, KEY_PREVIOUS_TRACK, KEY_STOP, KEY_PLAY_PAUSE, KEY_MUTE, KEY_VOLUME_UP, KEY_VOLUME_DOWN)
-    * @returns true if there is no error, false otherwise
-    */
-    bool media_control(MEDIA_KEY key);
+    bool key_press(int key);
 
     /*
     * To define the report descriptor. Warning: this method has to store the length of the report descriptor in reportLength.
@@ -181,16 +153,6 @@ public:
     * Called when a data is received on the OUT endpoint. Useful to switch on LED of LOCK keys
     */
     virtual void report_rx();
-
-    /**
-    * Read status of lock keys. Useful to switch-on/off leds according to key pressed. Only the first three bits of the result is important:
-    *   - First bit: NUM_LOCK
-    *   - Second bit: CAPS_LOCK
-    *   - Third bit: SCROLL_LOCK
-    *
-    * @returns status of lock keys
-    */
-    uint8_t lock_status();
 
     uint8_t led_status();
 
@@ -206,11 +168,7 @@ protected:
 
 private:
 
-    //dummy otherwise it doesn't compile (we must define all methods of an abstract class)
-    virtual int _getc();
-
     uint8_t _configuration_descriptor[41];
-    uint8_t _lock_status;
     bool _led_status_updated;
     uint8_t _led_status;
     PlatformMutex _mutex;
